@@ -47,6 +47,7 @@ export class CanvasClientTestComponent implements OnInit, AfterViewInit {
       resetCam:()=>{
         this.canvas3d.getDefaultCamera()?.resetToDefaultPosition();
       },
+      bvalue:true,
     };
 
     const gui = new dat.GUI()
@@ -57,6 +58,9 @@ export class CanvasClientTestComponent implements OnInit, AfterViewInit {
     renderFolder.open()
     const cameraFolder = gui.addFolder('Camera');
     cameraFolder.add(guiProps,"resetCam");
+    cameraFolder.add(guiProps,"bvalue").name("enabled orbit controls").onChange((value)=>{
+      this.canvas3d.getCurrentCamera()?.setOrbitControlsEnabled(value);
+    })
 
     cameraFolder.open()
 
