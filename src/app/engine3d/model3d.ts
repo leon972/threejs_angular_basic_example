@@ -1,23 +1,21 @@
 import * as THREE from "three";
+import { Vector3 } from "three";
 
-export abstract class Model3D {
+export class Model3D {
     protected parent?: Model3D;
     private mesh?: THREE.Mesh;
-    private layer:number=0; //0-31
-    public constructor(protected readonly geometry: THREE.BufferGeometry, protected readonly material: THREE.Material) {
+    private layer: number = 0; //0-31
+    public constructor(protected readonly geometry: THREE.BufferGeometry | undefined, protected readonly material: THREE.Material | undefined) {
         this.createMesh();
     }
 
-    public get visible():boolean
-    {
+    public get visible(): boolean {
         return !!this.mesh && this.mesh.visible;
     }
 
-    public set visible(v:boolean)
-    {
-        if (this.mesh)
-        {
-            this.mesh.visible=v;
+    public set visible(v: boolean) {
+        if (this.mesh) {
+            this.mesh.visible = v;
         }
     }
 
@@ -30,61 +28,71 @@ export abstract class Model3D {
     }
 
     private createMesh(): void {
-        this.mesh = new THREE.Mesh(this.geometry, this.material);
+        if (this.geometry && this.material) {
+            this.mesh = new THREE.Mesh(this.geometry, this.material);
+        }
     }
 
     public getMesh(): THREE.Mesh | undefined {
         return this.mesh;
     }
 
-    public setPosition(x: number | undefined=undefined, y: number | undefined=undefined, z: number | undefined=undefined): void {
+    public getObject3D(): THREE.Object3D | undefined {
+        return this.mesh;
+    }
+
+    public setPosition(x: number | undefined = undefined, y: number | undefined = undefined, z: number | undefined = undefined): void {
 
         if (this.mesh) {
             if (x !== undefined) {
                 this.mesh.position.x = x;
             }
-            if (y !== undefined)
-            {
-                this.mesh.position.y=y;
+            if (y !== undefined) {
+                this.mesh.position.y = y;
             }
-            if (z !== undefined)
-            {
-                this.mesh.position.z=z;
+            if (z !== undefined) {
+                this.mesh.position.z = z;
             }
         }
-    }  
+    }
 
-    public setRotation(rx:number |undefined=undefined,ry:number|undefined=undefined,rz:number|undefined=undefined)
-    {
+    public setScale(x: number, y: number, z: number): void {
+        this.mesh?.scale.set(x, y, z);
+    }
+
+    public setRotation(rx: number | undefined = undefined, ry: number | undefined = undefined, rz: number | undefined = undefined) {
         if (this.mesh) {
             if (rx !== undefined) {
                 this.mesh.rotation.x = rx;
             }
-            if (ry !== undefined)
-            {
-                this.mesh.rotation.y=ry;
+            if (ry !== undefined) {
+                this.mesh.rotation.y = ry;
             }
-            if (rz !== undefined)
-            {
-                this.mesh.rotation.z=rz;
+            if (rz !== undefined) {
+                this.mesh.rotation.z = rz;
             }
         }
     }
-    
-    public getLayer():number
-    {
+
+    public getLayer(): number {
         return this.layer;
     }
 
-    public setLayer(layer:number):void
-    {
-        if (layer>=0 && layer<32)
-        {
-            this.layer=layer;
+    public setLayer(layer: number): void {
+        if (layer >= 0 && layer < 32) {
+            this.layer = layer;
         }
-        else
-        {
-            throw new Error('Invalid layer:'+layer);
+        else {
+            throw new Error('Invalid layer:' + layer);
+        }
+    }
+
+    public addToScene(scene: THREE.Scene): void {
+        if (this.mesh) {
+            scene.add(this.mesh);
+        }
+        else {
+            throw new Error('Object without mesh');
         }
     }
 
