@@ -77,17 +77,41 @@ export class WireframeMesh implements GeneralMesh {
 
 export class Model3DMultiMesh extends Model3D {
 
-    private meshes: Array<GeneralMesh> = [];
+    private meshes: Map<string,GeneralMesh> = new Map<string,GeneralMesh>();
 
     public constructor() {
         super(undefined, undefined);
     }
 
-    public addMesh(mesh: GeneralMesh): GeneralMesh {
+    public addMesh(meshName:string,mesh: GeneralMesh): GeneralMesh {
+
+        if (!meshName)
+        {
+            throw new Error('Mesh name not set!');
+        }
+        else if (this.meshes.has(meshName))
+        {
+            throw new Error(`${meshName} already exists`);
+        }
+
         if (mesh) {
-            this.meshes.push(mesh);
+            this.meshes.set(meshName,mesh);
         }
         return mesh;
+    }
+
+    public getMeshByName(meshName:string):GeneralMesh|undefined
+    {
+        return this.meshes.get(meshName);
+    }
+
+    public setMeshEnabled(meshName:string,enabled:boolean):void
+    {
+        const m:GeneralMesh|undefined=this.getMeshByName(meshName);
+        if (m)
+        {
+            m.setEnabled(enabled);
+        }
     }
 
     public addToScene(scene: THREE.Scene): void {
@@ -107,6 +131,24 @@ export class Model3DMultiMesh extends Model3D {
                 }
                 if (z !== undefined) {
                     obj.position.z = z;
+                }
+            }
+        });
+    }
+
+    public incPosition(dx:number,dy:number,dz:number):void
+    {
+        this.meshes.forEach(m => {
+            if (m) {
+                const obj: THREE.Object3D = m.getObject3D();
+                if (dx !== undefined) {
+                    obj.position.x += dx;
+                }
+                if (dy !== undefined) {
+                    obj.position.y += dy;
+                }
+                if (dz !== undefined) {
+                    obj.position.z += dz;
                 }
             }
         });
@@ -136,5 +178,24 @@ export class Model3DMultiMesh extends Model3D {
             }
         });
     }
+
+    public incRotation(drx: number | undefined = undefined, dry: number | undefined = undefined, drz: number | undefined = undefined) {
+
+        this.meshes.forEach(m => {
+            if (m) {
+                const obj: THREE.Object3D = m.getObject3D();
+                if (drx !== undefined) {
+                    obj.rotation.x += drx;
+                }
+                if (dry !== undefined) {
+                    obj.rotation.y += dry;
+                }
+                if (drz !== undefined) {
+                    obj.rotation.z += drz;
+                }
+            }
+        });
+
+    }  
 
 }

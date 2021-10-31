@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { Vector3 } from "three";
+import { NumberKeyframeTrack, Vector3 } from "three";
 
 export class Model3D {
     protected parent?: Model3D;
@@ -56,6 +56,22 @@ export class Model3D {
         }
     }
 
+    public incPosition(dx:number,dy:number,dz:number):void
+    {
+        if (this.mesh)
+        {
+            if (dx !== undefined) {
+                this.mesh.position.x += dx;
+            }
+            if (dy !== undefined) {
+                this.mesh.position.y  +=dy;
+            }
+            if (dz !== undefined) {
+                this.mesh.position.z +=dz;
+            }
+        }
+    }
+
     public setScale(x: number, y: number, z: number): void {
         this.mesh?.scale.set(x, y, z);
     }
@@ -73,6 +89,23 @@ export class Model3D {
             }
         }
     }
+
+    public incRotation(drx: number | undefined = undefined, dry: number | undefined = undefined, drz: number | undefined = undefined) {
+        
+        if (this.mesh) {
+            if (drx !== undefined) {
+                this.mesh.rotation.x += drx;
+            }
+            if (dry !== undefined) {
+                this.mesh.rotation.y += dry;
+            }
+            if (drz !== undefined) {
+                this.mesh.rotation.z += drz;
+            }
+        }
+        
+    }
+
 
     public getLayer(): number {
         return this.layer;

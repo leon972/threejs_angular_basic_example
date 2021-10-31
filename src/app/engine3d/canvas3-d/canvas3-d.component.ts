@@ -1,7 +1,10 @@
 import { AfterViewInit, Component, ElementRef, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import * as THREE from "three";
 import { PerspectiveCamera } from 'three';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import { Camera3D, PerspectiveCamera3D } from '../cmeras';
 import { Model3D } from '../model3d';
+
 
 @Component({
   selector: 'app-canvas3d',
@@ -15,25 +18,25 @@ export class Canvas3DComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input() updateScene?: () => void;
   @Input() updateOnResize = true;
   @Input() useWindowSize = true;
-  private defaultCamera?: THREE.PerspectiveCamera;
-  private currentCamera: THREE.Camera | undefined;
+  private defaultCamera?: Camera3D;
+  private currentCamera: Camera3D | undefined;
   private renderer!: THREE.WebGLRenderer;
   private scene!: THREE.Scene;
   private animFrameID: number | undefined;
-
+  private ambientLight?:THREE.AmbientLight=new THREE.AmbientLight(0xffffff);
+  
   constructor() {
-
   }
 
-  private get canvas(): HTMLCanvasElement {
+  public get canvas(): HTMLCanvasElement {
     return this.canvasRef.nativeElement;
   }
 
-  public setCurrentCamera(camera: THREE.Camera | undefined): void {
+  public setCurrentCamera(camera: Camera3D | undefined): void {
     this.currentCamera = camera;
   }
 
-  public getCurrentCamera(): THREE.Camera | undefined {
+  public getCurrentCamera(): Camera3D| undefined {
     return this.currentCamera;
   }
 
@@ -51,7 +54,7 @@ export class Canvas3DComponent implements OnInit, AfterViewInit, OnDestroy {
     return this.useWindowSize ? window.innerHeight : this.canvas.clientHeight;
   }
 
-  public getDefaultCamera(): THREE.Camera | undefined {
+  public getDefaultCamera():Camera3D | undefined {
     return this.defaultCamera;
   }
 
@@ -69,6 +72,11 @@ export class Canvas3DComponent implements OnInit, AfterViewInit, OnDestroy {
     return this.scene.background;
   }
 
+  public getOrbitControls(camera:Camera3D):OrbitControls
+  {
+     return new OrbitControls(camera.getCamera(),this.renderer.domElement);
+  }
+
   public startRenderingLoop(): void {
     this.stopRenderingLoop();
     this.renderer.setSize(this.canvas.clientWidth, this.canvas.clientHeight);
@@ -79,7 +87,8 @@ export class Canvas3DComponent implements OnInit, AfterViewInit, OnDestroy {
         _this.updateScene();
       }
       if (_this.currentCamera) {
-        _this.renderer.render(_this.scene, _this.currentCamera);
+        _this.currentCamera.update();
+        _this.renderer.render(_this.scene, _this.currentCamera.getCamera());
       }
     }
     )();
@@ -101,7 +110,7 @@ export class Canvas3DComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnInit(): void {
-
+   
   }
 
   ngAfterViewInit(): void {
@@ -125,20 +134,24 @@ export class Canvas3DComponent implements OnInit, AfterViewInit, OnDestroy {
 
     }, false);
 
-
-    this.defaultCamera = new THREE.PerspectiveCamera(75, this.getAspectRatio(), 1, 1000);
-    this.defaultCamera.position.set(0, 0, 0);
-    this.defaultCamera.lookAt(0, 0, 1); //look positive z axis
-    this.defaultCamera.layers.enableAll();
     this.scene = new THREE.Scene();
+    if (this.ambientLight) {
+      this.ambientLight.intensity=0.4;
+      this.ambientLight.visible=true;
+      this.scene.add(this.ambientLight);
+    }
+
+    this.defaultCamera = new PerspectiveCamera3D(75, this.getAspectRatio(), 1, 1000);    
+    this.defaultCamera.lookAt(0, 0, 1); //look positive z axis
+    this.defaultCamera.getCamera().layers.enableAll();  
     this.setSceneBacckGround(new THREE.Color(0x000000));
     this.renderer = new THREE.WebGLRenderer({ canvas: this.canvas });
     this.renderer.setSize(this.canvas.clientWidth, this.canvas.clientHeight);
     this.renderer.setPixelRatio(window.devicePixelRatio);
     this.currentCamera = this.defaultCamera;
-    this.scene.add(this.defaultCamera);
-
+    this.defaultCamera.addToScene(this.scene);  
     this.startRenderingLoop();
+
   }
 
   ngOnDestroy(): void {
@@ -154,6 +167,23 @@ export class Canvas3DComponent implements OnInit, AfterViewInit, OnDestroy {
   public removeModel(m: Model3D | undefined): void {
     if (m) {
       this.scene.remove(m as any);
+    }
+  }
+
+  public enableAmbientLight(enabled:boolean):void
+  {
+    if (this.ambientLight)
+    {
+      this.ambientLight.visible=enabled;
+    }
+  }
+
+  public setAmbientLight(color:THREE.Color,intensity:number):void
+  {
+    if(this.ambientLight)
+    {
+      this.ambientLight.color=color;
+      this.ambientLight.intensity=intensity;
     }
   }
 
