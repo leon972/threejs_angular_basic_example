@@ -98,6 +98,12 @@ export abstract class Camera3D {
         }
     }
 
+    public saveCurrentPosition(name:string):void
+    {
+        const cp=new CameraPosition(this.camera.position.x,this.camera.position.y,this.camera.position.z,this.camera.rotation.x,this.camera.rotation.y,this.camera.rotation.z);
+        this.addPosition(name,cp);
+    }
+
     public setPosition2(pos: CameraPosition): void {
         if (pos) {
             pos.apply(this);
@@ -124,7 +130,7 @@ export abstract class Camera3D {
 
     public update(): void {
         if (this.orbitcontrolsEnabled && this.controls) {
-            this.controls.update();
+            this.controls.update();            
         }
     }
 }

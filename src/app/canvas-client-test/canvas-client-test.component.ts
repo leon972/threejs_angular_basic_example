@@ -45,9 +45,16 @@ export class CanvasClientTestComponent implements OnInit, AfterViewInit {
     var guiProps={
       enableWireframe:true,
       resetCam:()=>{
-        this.canvas3d.getDefaultCamera()?.resetToDefaultPosition();
+        this.canvas3d.getCurrentCamera()?.resetToDefaultPosition();
       },
       bvalue:true,
+      savePos:()=>{
+        this.canvas3d.getCurrentCamera()?.saveCurrentPosition("cur");
+      },
+      restorePos:()=>{
+        this.canvas3d.getCurrentCamera()?.setPosition("cur");
+      }
+
     };
 
     const gui = new dat.GUI()
@@ -61,6 +68,8 @@ export class CanvasClientTestComponent implements OnInit, AfterViewInit {
     cameraFolder.add(guiProps,"bvalue").name("enabled orbit controls").onChange((value)=>{
       this.canvas3d.getCurrentCamera()?.setOrbitControlsEnabled(value);
     })
+    cameraFolder.add(guiProps,"savePos").name("Save camera position");
+    cameraFolder.add(guiProps,"restorePos").name("Restore camera position");
 
     cameraFolder.open()
 
