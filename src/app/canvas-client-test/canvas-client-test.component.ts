@@ -85,9 +85,10 @@ export class CanvasClientTestComponent implements OnInit, AfterViewInit {
 scene.add( light );
     this.canvas3d.addModel(this.cube);
     this.canvas3d.addModel(this.obj1);
-    this.canvas3d.addModel(this.cyl);
+   // this.canvas3d.addModel(this.cyl);
     this.canvas3d.updateScene = this.updateScene;
     this.canvas3d.getDefaultCamera()?.setupOrbitControls(this.canvas3d, 0, 0, 18);
+    this.addShaft([6,4,3, 8,4,3, 9,8.5,6, 9.665,8.11,5.44, 7,4,3, 7.2,4,4, 7.8,4,5, 11,4.12,2, 18,4,1.5, 14,4,0.8, 18,4,1.5, 5,4,6],0,0,0);
   }
 
   private updateScene(): void {
@@ -97,10 +98,27 @@ scene.add( light );
     }
     if (_this.obj1) {
       _this.obj1.incRotation(-0.01, 0.0, 0.01);
-    }
-  //  _this.cyl.incRotation(-0.01, 0.0, 0.01);
+    } 
   }
 
+  private addShaft(data:number[],x0:number,y0:number,z0:number):void
+  {
+    if ((data.length % 3)!==0)
+    {
+      throw new Error("Invalid shaft data");
+    }
+    let z=0;
+    for (let i=0;i<data.length;i+=3)
+    {
+      let de=data[i];
+      let di=data[i+1];
+      let len=data[i+2];
+      const cyl:HollowCylinder=new HollowCylinder(90,de,di,len,0x49718C,0x6BCBDF);
+      cyl.setPosition(x0,y0,z);
+      z+=len;
+      this.canvas3d.addModel(cyl);
+    }    
+  }
 }
 
 
