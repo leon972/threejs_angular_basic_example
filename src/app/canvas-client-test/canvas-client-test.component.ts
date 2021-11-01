@@ -44,7 +44,7 @@ export class CanvasClientTestComponent implements OnInit, AfterViewInit {
     this.obj1.setPosition(12, 4, 18);
     this.obj1.setRotation(0.56, 0.11, 0.45);
 
-    this.cyl=new HollowCylinder(0,10,8,14,0x49718C);
+    this.cyl=new HollowCylinder(0,10,8,14,0x49718C,0x6BCBDF);
     this.cyl.setPosition(-10,3,15);
 
     var guiProps={

@@ -11,10 +11,12 @@ export class HollowCylinder extends Model3DMultiMesh {
     private readonly startAngle=90;
     private readonly endAngle=360;
     private cmaterial!:THREE.Material;   
+    private sectionMaterial!:THREE.Material;
 
     public constructor(public readonly sectionAngle: number = 0, public readonly de: number, public readonly di: number, public readonly length: number, private color: THREE.ColorRepresentation,private sectionColor:THREE.ColorRepresentation) {
         super();
         this.cmaterial=new THREE.MeshPhongMaterial( {color:color,side: THREE.DoubleSide,wireframe:false,opacity:this.OPACITY,transparent:true});      
+        this.sectionMaterial=new THREE.MeshPhongMaterial( {color:sectionColor,side: THREE.DoubleSide,wireframe:false,opacity:1,transparent:false});      
         const extMesh = new BaseMesh(this.createCylinderSurface(this.de,true), this.cmaterial);
         this.addMesh("external", extMesh);     
         const intMesh = new BaseMesh(this.createCylinderSurface(this.di,false),  this.cmaterial);
@@ -22,7 +24,11 @@ export class HollowCylinder extends Model3DMultiMesh {
         const sideMesh1=new BaseMesh(this.createSideGeometry(0,false),this.cmaterial);
         this.addMesh("side1",sideMesh1);   
         const sideMesh2=new BaseMesh(this.createSideGeometry(length,true),this.cmaterial);
-        this.addMesh("side2",sideMesh2);                         
+        this.addMesh("side2",sideMesh2); 
+        const sectionMesh1=new BaseMesh(this.createSectionGeometry(this.startAngle),this.sectionMaterial);
+        this.addMesh("section1",sectionMesh1); 
+        const sectionMesh2=new BaseMesh(this.createSectionGeometry(this.endAngle),this.sectionMaterial);
+        this.addMesh("section2",sectionMesh2);                       
     }
 
     private createCylinderSurface(diameter:number,external:boolean): THREE.BufferGeometry {
@@ -79,6 +85,24 @@ export class HollowCylinder extends Model3DMultiMesh {
         return this.point;    
     }
 
+    private getSectionPoint(z:number,r:number,angle:number):SurfacePoint
+    {
+        angle=angle*this.DEG_TO_RAD;
+        this.point.x=r*Math.cos(angle);
+        this.point.y=r*Math.sin(angle);
+        this.point.z=z;
+        return this.point;
+    }
+
+    private getSectionNormal(angle:number)
+    {
+        angle=angle*this.DEG_TO_RAD;
+        this.point.x=Math.sin(angle);
+        this.point.y=Math.cos(angle);
+        this.point.z=0;
+        return this.point;
+    }
+
     private createSideGeometry(z:number,normalPositiveZ:boolean):THREE.BufferGeometry
     {
         const n:number=normalPositiveZ ? 1:-1;
@@ -94,5 +118,18 @@ export class HollowCylinder extends Model3DMultiMesh {
         }
         , this.DELTA_ANGLE,deltav, this.startAngle,this.endAngle,minv,maxv);       
         return psurface.createGeometry();                
+    }
+
+    private createSectionGeometry(angle:number):THREE.BufferGeometry
+    {
+        const minv=this.di/2;
+        const maxv=this.de/2;
+        const deltav=maxv-minv;
+        const psurface = new ParametricSurface((u: number, v: number) => { return this.getSectionPoint(u, v,angle) },
+        (u: number, v: number) => {
+            return this.getSectionNormal(angle);
+        }
+        , this.length,deltav, 0,this.length,minv,maxv);       
+        return psurface.createGeometry();      
     }
 }

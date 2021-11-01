@@ -4,7 +4,7 @@ import { NumberKeyframeTrack, Vector3 } from "three";
 export class Model3D {
     protected parent?: Model3D;
     private mesh?: THREE.Mesh;
-    private layer: number = 0; //0-31
+   
     public constructor(protected readonly geometry: THREE.BufferGeometry | undefined, protected readonly material: THREE.Material | undefined) {
         this.createMesh();
     }
@@ -16,6 +16,22 @@ export class Model3D {
     public set visible(v: boolean) {
         if (this.mesh) {
             this.mesh.visible = v;
+        }        
+    }
+
+    public setLayer(layer:number)
+    {
+        if (this.mesh)
+        {
+            this.mesh.layers.set(layer);            
+        }
+    }
+
+    public disableLayer(layer:number)
+    {
+        if (this.mesh)
+        {
+            this.mesh.layers.disable(layer);            
         }
     }
 
@@ -105,21 +121,7 @@ export class Model3D {
         }
         
     }
-
-
-    public getLayer(): number {
-        return this.layer;
-    }
-
-    public setLayer(layer: number): void {
-        if (layer >= 0 && layer < 32) {
-            this.layer = layer;
-        }
-        else {
-            throw new Error('Invalid layer:' + layer);
-        }
-    }
-
+   
     public addToScene(scene: THREE.Scene): void {
         if (this.mesh) {
             scene.add(this.mesh);

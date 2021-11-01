@@ -8,6 +8,7 @@ export interface GeneralMesh {
     getEnabled(): boolean;
     getObject3D(): THREE.Object3D;
   
+  
 }
 
 export class BaseMesh implements GeneralMesh {
@@ -16,9 +17,9 @@ export class BaseMesh implements GeneralMesh {
     public constructor(public readonly geometry: THREE.BufferGeometry, public readonly material: THREE.Material) {
         if (this.geometry && this.material) {
             this.mesh = new THREE.Mesh(this.geometry, this.material);            
-        }
+        }        
     }
-    
+       
     getObject3D(): THREE.Object3D {
         return this.mesh;
     }
@@ -50,8 +51,7 @@ export class WireframeMesh implements GeneralMesh {
         const mat=new THREE.LineBasicMaterial({color});
         this.lines = new THREE.LineSegments(wireframe,mat);       
         mat.opacity = opacity;
-        mat.transparent = !showMaterial;
-
+        mat.transparent = !showMaterial;  
     }
    
     getObject3D(): THREE.Object3D {
@@ -152,6 +152,28 @@ export class Model3DMultiMesh extends Model3D {
                 if (dz !== undefined) {
                     obj.position.z += dz;
                 }
+            }
+        });
+    }
+
+    public setLayer(layer:number)
+    {
+        this.meshes.forEach(m=>{
+            const obj:THREE.Object3D=m.getObject3D();
+            if (obj)
+            {
+                obj.layers.set(layer);
+            }
+        });
+    }
+
+    public disableLayer(layer:number)
+    {
+        this.meshes.forEach(m=>{
+            const obj:THREE.Object3D=m.getObject3D();
+            if (obj)
+            {
+                obj.layers.disable(layer);
             }
         });
     }
