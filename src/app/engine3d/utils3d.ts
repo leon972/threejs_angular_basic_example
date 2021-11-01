@@ -28,8 +28,10 @@ export const ObjectsUtils =
         m.depthTest = false;        
         m.opacity = 0.25;
         m.transparent = true;
+       
         return line;
-    }
+    }      
+    
 }
 export class SimpleCube extends Model3D {
     public constructor(sidex: number, sidey: number, sidez: number, material: THREE.Material) {

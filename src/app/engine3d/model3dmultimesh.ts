@@ -7,6 +7,7 @@ export interface GeneralMesh {
     setEnabled(enabled: boolean): void;
     getEnabled(): boolean;
     getObject3D(): THREE.Object3D;
+  
 }
 
 export class BaseMesh implements GeneralMesh {
@@ -14,16 +15,16 @@ export class BaseMesh implements GeneralMesh {
     private mesh!: THREE.Mesh;
     public constructor(public readonly geometry: THREE.BufferGeometry, public readonly material: THREE.Material) {
         if (this.geometry && this.material) {
-            this.mesh = new THREE.Mesh(this.geometry, this.material);
-            
+            this.mesh = new THREE.Mesh(this.geometry, this.material);            
         }
     }
+    
     getObject3D(): THREE.Object3D {
         return this.mesh;
     }
     addToScene(scene: Scene): void {
         if (this.mesh) {
-            scene.add(this.mesh);
+            scene.add(this.mesh);            
         }
         else {
             throw new Error('Object without mesh');
@@ -52,6 +53,7 @@ export class WireframeMesh implements GeneralMesh {
         mat.transparent = !showMaterial;
 
     }
+   
     getObject3D(): THREE.Object3D {
         this.lines?.position
         return this.lines as THREE.Object3D;
@@ -77,7 +79,7 @@ export class WireframeMesh implements GeneralMesh {
 
 export class Model3DMultiMesh extends Model3D {
 
-    private meshes: Map<string,GeneralMesh> = new Map<string,GeneralMesh>();
+    protected meshes: Map<string,GeneralMesh> = new Map<string,GeneralMesh>();
 
     public constructor() {
         super(undefined, undefined);

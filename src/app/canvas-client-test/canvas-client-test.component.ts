@@ -4,6 +4,7 @@ import { MaterialUtils, SimpleCube } from '../engine3d/utils3d';
 import * as THREE from "three";
 import { BaseMesh, Model3DMultiMesh, GeneralMesh, WireframeMesh } from '../engine3d/model3dmultimesh';
 import * as dat from 'dat.gui';
+import { HollowCylinder } from './primitives/hollow-cylinder';
 
 let _this: any;
 
@@ -18,6 +19,7 @@ export class CanvasClientTestComponent implements OnInit, AfterViewInit {
 
   private cube!: SimpleCube;
   private obj1!: Model3DMultiMesh;
+  private cyl!:HollowCylinder;
 
   constructor() {
 
@@ -28,7 +30,8 @@ export class CanvasClientTestComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    this.cube = new SimpleCube(5, 5, 5, MaterialUtils.createPhongMaterial(new THREE.Color(0xff2222)));
+    //this.cube = new SimpleCube(5, 5, 5, MaterialUtils.createPhongMaterial(new THREE.Color(0xff2222)));
+    this.cube = new SimpleCube(5, 5, 5, new THREE.MeshStandardMaterial({color:0xff0000}));
     this.cube.setPosition(0, 0, 15);
     this.cube.setRotation(0.12, -0.9, -1);
     //multi mesh
@@ -41,6 +44,8 @@ export class CanvasClientTestComponent implements OnInit, AfterViewInit {
     this.obj1.setPosition(12, 4, 18);
     this.obj1.setRotation(0.56, 0.11, 0.45);
 
+    this.cyl=new HollowCylinder(0,10,8,14,0x49718C);
+    this.cyl.setPosition(-10,3,15);
 
     var guiProps={
       enableWireframe:true,
@@ -74,9 +79,13 @@ export class CanvasClientTestComponent implements OnInit, AfterViewInit {
     cameraFolder.open()
 
     //add the model to canvas3d
-    this.canvas3d.addDirectionalLight(0, 0, -4, 0xFFFFFF, 1);
+   // this.canvas3d.addDirectionalLight(0, 0, -4, 0xFFFFFF, 1);
+    const scene=this.canvas3d.getScene();
+    const light = new THREE.HemisphereLight( 0xffffbb, 0x080820,0.6 );
+scene.add( light );
     this.canvas3d.addModel(this.cube);
     this.canvas3d.addModel(this.obj1);
+    this.canvas3d.addModel(this.cyl);
     this.canvas3d.updateScene = this.updateScene;
     this.canvas3d.getDefaultCamera()?.setupOrbitControls(this.canvas3d, 0, 0, 18);
   }
@@ -89,6 +98,7 @@ export class CanvasClientTestComponent implements OnInit, AfterViewInit {
     if (_this.obj1) {
       _this.obj1.incRotation(-0.01, 0.0, 0.01);
     }
+  //  _this.cyl.incRotation(-0.01, 0.0, 0.01);
   }
 
 }
