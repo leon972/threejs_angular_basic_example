@@ -16,15 +16,15 @@ export class Canvas3DComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('canvas')
   private canvasRef!: ElementRef;
   @Input() updateScene?: () => void;
+  //set camera apsect ratio on resize
   @Input() updateOnResize = true;
-  @Input() useWindowSize = true;
   private defaultCamera?: Camera3D;
   private currentCamera: Camera3D | undefined;
   private renderer!: THREE.WebGLRenderer;
   private scene!: THREE.Scene;
   private animFrameID: number | undefined;
-  private ambientLight?:THREE.AmbientLight=new THREE.AmbientLight(0xffffff);
-  
+  private ambientLight?: THREE.AmbientLight = new THREE.AmbientLight(0xffffff);
+
   constructor() {
   }
 
@@ -36,25 +36,23 @@ export class Canvas3DComponent implements OnInit, AfterViewInit, OnDestroy {
     this.currentCamera = camera;
   }
 
-  public getCurrentCamera(): Camera3D| undefined {
+  public getCurrentCamera(): Camera3D | undefined {
     return this.currentCamera;
   }
 
   public getAspectRatio(): number {
-    return this.getWidth()/this.getHeight();
+    return this.getWidth() / this.getHeight();
   }
 
-  public getWidth():number
-  {
-    return this.useWindowSize ? window.innerWidth : this.canvas.clientWidth;
+  public getWidth(): number {
+    return this.canvas.clientWidth;
   }
 
-  public getHeight():number
-  {
-    return this.useWindowSize ? window.innerHeight : this.canvas.clientHeight;
+  public getHeight(): number {
+    return this.canvas.clientHeight;
   }
 
-  public getDefaultCamera():Camera3D | undefined {
+  public getDefaultCamera(): Camera3D | undefined {
     return this.defaultCamera;
   }
 
@@ -72,9 +70,8 @@ export class Canvas3DComponent implements OnInit, AfterViewInit, OnDestroy {
     return this.scene.background;
   }
 
-  public getOrbitControls(camera:Camera3D):OrbitControls
-  {
-     return new OrbitControls(camera.getCamera(),this.renderer.domElement);
+  public getOrbitControls(camera: Camera3D): OrbitControls {
+    return new OrbitControls(camera.getCamera(), this.renderer.domElement);
   }
 
   public startRenderingLoop(): void {
@@ -110,7 +107,7 @@ export class Canvas3DComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnInit(): void {
-   
+
   }
 
   ngAfterViewInit(): void {
@@ -119,16 +116,16 @@ export class Canvas3DComponent implements OnInit, AfterViewInit, OnDestroy {
 
     window.addEventListener('resize', () => {
       if (_this.updateOnResize) {
-        const ar = this.getAspectRatio();
+     
         if (this.currentCamera) {
-          
+
           if (this.currentCamera instanceof PerspectiveCamera) {
-            const pcamera:PerspectiveCamera=this.currentCamera as PerspectiveCamera;
-          pcamera.aspect = this.getAspectRatio();
-          this.currentCamera.updateProjectionMatrix();
-          // this.currentCamera.updateProjectionMatrix();
+            const pcamera: PerspectiveCamera = this.currentCamera as PerspectiveCamera;
+            pcamera.aspect =this.getAspectRatio();
+            this.currentCamera.updateProjectionMatrix();
+            // this.currentCamera.updateProjectionMatrix();
           }
-          this.renderer.setSize(this.getWidth(),this.getHeight());
+          this.renderer.setSize(this.getWidth(), this.getHeight());
         }
       }
 
@@ -136,31 +133,31 @@ export class Canvas3DComponent implements OnInit, AfterViewInit, OnDestroy {
 
     this.scene = new THREE.Scene();
     if (this.ambientLight) {
-      this.ambientLight.intensity=0.4;
-      this.ambientLight.visible=true;
+      this.ambientLight.intensity = 0.4;
+      this.ambientLight.visible = true;
       this.scene.add(this.ambientLight);
     }
 
-    this.defaultCamera = new PerspectiveCamera3D(75, this.getAspectRatio(), 1, 1000);    
+    this.defaultCamera = new PerspectiveCamera3D(75, this.getAspectRatio(), 1, 1000);
     this.defaultCamera.lookAt(0, 0, 1); //look positive z axis
-    this.defaultCamera.getCamera().layers.enableAll();  
+    this.defaultCamera.getCamera().layers.enableAll();
     this.setSceneBacckGround(new THREE.Color(0x000000));
     this.renderer = new THREE.WebGLRenderer({ canvas: this.canvas });
     this.renderer.setSize(this.canvas.clientWidth, this.canvas.clientHeight);
     this.renderer.setPixelRatio(window.devicePixelRatio);
     this.currentCamera = this.defaultCamera;
-    this.defaultCamera.addToScene(this.scene);  
+    this.defaultCamera.addToScene(this.scene);
     this.startRenderingLoop();
 
   }
 
   ngOnDestroy(): void {
-    this.startRenderingLoop();
+    this.stopRenderingLoop();
   }
 
   public addModel(m: Model3D): void {
     if (this.scene && m) {
-     m.addToScene(this.scene);
+      m.addToScene(this.scene);
     }
   }
 
@@ -170,20 +167,16 @@ export class Canvas3DComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  public enableAmbientLight(enabled:boolean):void
-  {
-    if (this.ambientLight)
-    {
-      this.ambientLight.visible=enabled;
+  public enableAmbientLight(enabled: boolean): void {
+    if (this.ambientLight) {
+      this.ambientLight.visible = enabled;
     }
   }
 
-  public setAmbientLight(color:THREE.Color,intensity:number):void
-  {
-    if(this.ambientLight)
-    {
-      this.ambientLight.color=color;
-      this.ambientLight.intensity=intensity;
+  public setAmbientLight(color: THREE.Color, intensity: number): void {
+    if (this.ambientLight) {
+      this.ambientLight.color = color;
+      this.ambientLight.intensity = intensity;
     }
   }
 
