@@ -80,10 +80,25 @@ export class WireframeMesh implements GeneralMesh {
 export class Model3DMultiMesh extends Model3D {
 
     protected meshes: Map<string,GeneralMesh> = new Map<string,GeneralMesh>();
+    private _visible=true;
 
     public constructor() {
         super(undefined, undefined);
     }
+
+    public get visible(): boolean {
+        return this._visible;
+     }
+ 
+     public set visible(v: boolean) {
+         if (this.meshes)      
+         {
+             this.meshes.forEach(m=>{
+                 m.setEnabled(v);
+             });
+             this._visible=v;
+         }
+     }
 
     public addMesh(meshName:string,mesh: GeneralMesh): GeneralMesh {
 
@@ -138,7 +153,7 @@ export class Model3DMultiMesh extends Model3D {
         });
     }
 
-    public incPosition(dx:number,dy:number,dz:number):void
+    public incPosition(dx:number|undefined,dy:number|undefined,dz:number|undefined):void
     {
         this.meshes.forEach(m => {
             if (m) {

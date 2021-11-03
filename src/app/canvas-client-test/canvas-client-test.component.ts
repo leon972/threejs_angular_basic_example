@@ -5,6 +5,7 @@ import * as THREE from "three";
 import { BaseMesh, Model3DMultiMesh, GeneralMesh, WireframeMesh } from '../engine3d/model3dmultimesh';
 import * as dat from 'dat.gui';
 import { HollowCylinder } from './primitives/hollow-cylinder';
+import { LineModel3D } from '../engine3d/linemodel';
 
 let _this: any;
 
@@ -20,6 +21,7 @@ export class CanvasClientTestComponent implements OnInit, AfterViewInit {
   private cube!: SimpleCube;
   private obj1!: Model3DMultiMesh;
   private cyl!:HollowCylinder;
+  private line3d?:LineModel3D;
 
   constructor() {
 
@@ -44,11 +46,14 @@ export class CanvasClientTestComponent implements OnInit, AfterViewInit {
     this.obj1.setPosition(12, 4, 18);
     this.obj1.setRotation(0.56, 0.11, 0.45);
 
-    this.cyl=new HollowCylinder(0,10,8,14,0x49718C,0x6BCBDF);
+    this.cyl=new HollowCylinder(0,10,8,14,0x49718C,0x6BCBDF,0x7eb6bd,0x87d6c8);
     this.cyl.setPosition(-10,3,15);
+    this.line3d=this.createTestLine3d();
 
     var guiProps={
       enableWireframe:true,
+      shaftSolid:true,
+      shaftWireframe:true,
       resetCam:()=>{
         this.canvas3d.getCurrentCamera()?.resetToDefaultPosition();
       },
@@ -66,7 +71,7 @@ export class CanvasClientTestComponent implements OnInit, AfterViewInit {
     const renderFolder = gui.addFolder('Rendering')
     renderFolder.add(guiProps, 'enableWireframe').onChange((value)=> {
       this.obj1.setMeshEnabled("wireframe",value);
-    });
+    });    
     renderFolder.open()
     const cameraFolder = gui.addFolder('Camera');
     cameraFolder.add(guiProps,"resetCam");
@@ -83,12 +88,13 @@ export class CanvasClientTestComponent implements OnInit, AfterViewInit {
     const scene=this.canvas3d.getScene();
     const light = new THREE.HemisphereLight( 0xffffbb, 0x080820,0.6 );
 scene.add( light );
-    this.canvas3d.addModel(this.cube);
-    this.canvas3d.addModel(this.obj1);
+  //  this.canvas3d.addModel(this.cube);
+   // this.canvas3d.addModel(this.obj1);
    // this.canvas3d.addModel(this.cyl);
     this.canvas3d.updateScene = this.updateScene;
     this.canvas3d.getDefaultCamera()?.setupOrbitControls(this.canvas3d, 0, 0, 18);
     this.addShaft([6,4,3, 8,4,3, 9,8.5,6, 9.665,8.11,5.44, 7,4,3, 7.2,4,4, 7.8,4,5, 11,4.12,2, 18,4,1.5, 14,4,0.8, 18,4,1.5, 5,4,6],0,0,0);
+    this.canvas3d.addModel(this.line3d);
   }
 
   private updateScene(): void {
@@ -99,7 +105,7 @@ scene.add( light );
     if (_this.obj1) {
       _this.obj1.incRotation(-0.01, 0.0, 0.01);
     } 
-  }
+  } 
 
   private addShaft(data:number[],x0:number,y0:number,z0:number):void
   {
@@ -113,12 +119,25 @@ scene.add( light );
       let de=data[i];
       let di=data[i+1];
       let len=data[i+2];
-      const cyl:HollowCylinder=new HollowCylinder(90,de,di,len,0x49718C,0x6BCBDF);
+      const cyl:HollowCylinder=new HollowCylinder(90,de,di,len,0x49718C,0x6BCBDF,0x2A4D58,0x87d6c8);
       cyl.setPosition(x0,y0,z);
       z+=len;
       this.canvas3d.addModel(cyl);
     }    
   }
+
+  private createTestLine3d():LineModel3D
+  {
+     const vertices:THREE.Vector3[]=[
+      new THREE.Vector3(0,0,0),
+      new THREE.Vector3(6,4,3),
+      new THREE.Vector3(-2,3,4),
+      new THREE.Vector3(11,8,9)
+     ];
+
+     return new LineModel3D(vertices,0xD3D3D3,true,0xFF0000,0.3);
+  }
+
 }
 
 

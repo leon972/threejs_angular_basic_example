@@ -3,7 +3,7 @@ import { NumberKeyframeTrack, Vector3 } from "three";
 
 export class Model3D {
     protected parent?: Model3D;
-    private mesh?: THREE.Mesh;
+    protected mesh?: THREE.Mesh;
    
     public constructor(protected readonly geometry: THREE.BufferGeometry | undefined, protected readonly material: THREE.Material | undefined) {
         this.createMesh();

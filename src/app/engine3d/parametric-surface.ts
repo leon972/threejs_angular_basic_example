@@ -1,7 +1,7 @@
 import { Vector3 } from "three";
 import * as THREE from "three";
 
-export interface SurfacePoint
+export interface Point3D
 {
     x:number;
     y:number;
@@ -19,7 +19,7 @@ export class ParametricSurface {
      * @param minv 
      * @param maxv 
      */
-    public constructor(private readonly fn: (u: number, v: number) => SurfacePoint,private readonly fnNormal:(u:number,v:number)=>SurfacePoint,
+    public constructor(private readonly fn: (u: number, v: number) => Point3D,private readonly fnNormal:(u:number,v:number)=>Point3D,
         private readonly deltau: number, private readonly deltav: number, private readonly minu: number,
         private readonly maxu: number, private readonly minv: number, private readonly maxv: number) {
 
@@ -31,8 +31,8 @@ export class ParametricSurface {
         const indices: number[] = [];
         const vertices: number[] = [];
         const normals: number[] = [];
-        let line1: SurfacePoint[] = [];
-        let line2: SurfacePoint[] = [];
+        let line1: Point3D[] = [];
+        let line2: Point3D[] = [];
         let iu=0;
         let iv=0;
 
@@ -85,11 +85,11 @@ export class ParametricSurface {
         return null;
     }
 
-    private pushVertex(v: SurfacePoint, vertices: number[]): void {
+    private pushVertex(v: Point3D, vertices: number[]): void {
         vertices.push(v.x,v.y,v.z);        
     }
 
-    private pushVertexArray(v:SurfacePoint[],vertices:number[])
+    private pushVertexArray(v:Point3D[],vertices:number[])
     {
         for (let v1 of v)
         {
@@ -99,13 +99,13 @@ export class ParametricSurface {
         }
     }
 
-    private getLineOfPoints(v:number):SurfacePoint[]
+    private getLineOfPoints(v:number):Point3D[]
     {
-        const r:SurfacePoint[]=[];
+        const r:Point3D[]=[];
         for (let u=this.minu;u<=this.maxu+this.deltau;u+=this.deltau)
         {
-            let p:SurfacePoint=this.fn(u,v);
-            const np={} as SurfacePoint;
+            let p:Point3D=this.fn(u,v);
+            const np={} as Point3D;
             np.x=p.x;
             np.y=p.y;
             np.z=p.z;
@@ -114,13 +114,13 @@ export class ParametricSurface {
         return r;
     }
 
-    private getNormals(v:number):SurfacePoint[]
+    private getNormals(v:number):Point3D[]
     {
-        const r:SurfacePoint[]=[];
+        const r:Point3D[]=[];
         for (let u=this.minu;u<=this.maxu+this.deltau;u+=this.deltau)
         {   
             let n=this.fnNormal(u,v);
-            let nn={} as SurfacePoint;
+            let nn={} as Point3D;
             nn.x=n.x;
             nn.y=n.y;
             nn.z=n.z;                
