@@ -6,6 +6,7 @@ import { BaseMesh, Model3DMultiMesh, GeneralMesh, WireframeMesh } from '../engin
 import * as dat from 'dat.gui';
 import { HollowCylinder } from './primitives/hollow-cylinder';
 import { LineModel3D } from '../engine3d/linemodel';
+import { Model3D } from '../engine3d/model3d';
 
 let _this: any;
 
@@ -22,6 +23,7 @@ export class CanvasClientTestComponent implements OnInit, AfterViewInit {
   private obj1!: Model3DMultiMesh;
   private cyl!:HollowCylinder;
   private line3d?:LineModel3D;
+  private shaft:Array<HollowCylinder>=[];
 
   constructor() {
 
@@ -70,8 +72,11 @@ export class CanvasClientTestComponent implements OnInit, AfterViewInit {
     const gui = new dat.GUI()
     const renderFolder = gui.addFolder('Rendering')
     renderFolder.add(guiProps, 'enableWireframe').onChange((value)=> {
-      this.obj1.setMeshEnabled("wireframe",value);
-    });    
+    this.setShaftWireframe(value);
+    }); 
+    renderFolder.add(guiProps, 'shaftSolid').onChange((value)=> {
+      this.setShaftSolid(value);
+      });       
     renderFolder.open()
     const cameraFolder = gui.addFolder('Camera');
     cameraFolder.add(guiProps,"resetCam");
@@ -93,7 +98,7 @@ scene.add( light );
    // this.canvas3d.addModel(this.cyl);
     this.canvas3d.updateScene = this.updateScene;
     this.canvas3d.getDefaultCamera()?.setupOrbitControls(this.canvas3d, 0, 0, 18);
-    this.addShaft([6,4,3, 8,4,3, 9,8.5,6, 9.665,8.11,5.44, 7,4,3, 7.2,4,4, 7.8,4,5, 11,4.12,2, 18,4,1.5, 14,4,0.8, 18,4,1.5, 5,4,6],0,0,0);
+    this.addShaft([6,4,3, 8,4,3, 9,6,6, 9.665,6,5.44, 7,4,3, 7.2,5,4, 7.8,4,5, 11,4.12,2, 18,4,1.5, 14,4,0.8, 18,4,1.5, 5,4,6],0,0,0);
     this.canvas3d.addModel(this.line3d);
   }
 
@@ -120,10 +125,21 @@ scene.add( light );
       let di=data[i+1];
       let len=data[i+2];
       const cyl:HollowCylinder=new HollowCylinder(90,de,di,len,0x49718C,0x6BCBDF,0x2A4D58,0x87d6c8);
+      this.shaft.push(cyl);
       cyl.setPosition(x0,y0,z);
       z+=len;
       this.canvas3d.addModel(cyl);
     }    
+  }
+
+  private setShaftWireframe(v:boolean):void
+  {
+    this.shaft.forEach((s:HollowCylinder)=>s.showWireFrame(v));
+  }
+  
+  private setShaftSolid(v:boolean):void
+  {
+    this.shaft.forEach((s:HollowCylinder)=>s.showSolid(v));
   }
 
   private createTestLine3d():LineModel3D

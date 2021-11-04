@@ -37,8 +37,8 @@ export class HollowCylinder extends Model3DMultiMesh {
         const sectionMesh2 = new BaseMesh(this.createSectionGeometry(this.endAngle), this.sectionMaterial);
         this.addMesh("section2", sectionMesh2);
         this.createWireframe();
-
         this.showSolid(true);
+        this.showWireFrame(false);
     }
 
     public set visible(v: boolean) {
